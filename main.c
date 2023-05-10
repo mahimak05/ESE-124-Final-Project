@@ -3,29 +3,41 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "functions.h"
+//#include "functions.h"
 
-#define MAX_LEN 100
+#define MAX_LEN 30
+
+char maze[MAX_LEN][MAX_LEN];
 
 int main (){
+	FILE *inp = fopen ("maze1.txt", "r");
+	char c;
+	int index_row = 0, index_col = 0, i, j;
 
-FILE *maze;
-char line[MAX_LEN];
-
-    if((maze = fopen ("maze1.txt", "r")) == NULL){
+    if(inp== NULL){
         printf("Error, file couldn't be found.\n");
         exit(1);
     }
 
-    //read 
-
-    while (fgets(line, MAX_LEN, maze) != EOF)
-    {
-        fprintf(stdout, "%s", line);
-    }
-    
-    fclose(maze);
+    //read maze to 2d array
+    while((c = fgetc(inp)) != EOF) {
+		if(c!='\n'){
+			maze[index_row][index_col] = c;
+			index_col++;
+		}
+		else if (c == '\n'){
+		    index_row++;
+		    index_col = 0;
+		}
+	}
+	
+	//test: print maze
+	for(i = 0; i < sizeof(maze)/sizeof(maze[0]); i++){
+		for(j = 0; j < sizeof(maze[0])/sizeof(maze[0][0]); j++){
+			printf("%c", maze[i][j]);
+		}
+		printf("\n");
+	}
 
 }
-
 
