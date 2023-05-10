@@ -12,7 +12,7 @@ char maze[MAX_LEN][MAX_LEN];
 int main (){
 	FILE *inp = fopen ("maze1.txt", "r");
 	char c;
-	int index_row = 0, index_col = 0, i, j;
+	int index_row = 0, index_col = 0, i, j, total_rows, total_columns;
 
     if(inp== NULL){
         printf("Error, file couldn't be found.\n");
@@ -30,14 +30,16 @@ int main (){
 		    index_col = 0;
 		}
 	}
+    total_rows = index_row + 1;
+    total_columns = index_col;
 	
 	//test: print maze
-	for(i = 0; i < sizeof(maze)/sizeof(maze[0]); i++){
+	for(i = 0; i < total_rows; i++){
 		for(j = 0; j < sizeof(maze[0])/sizeof(maze[0][0]); j++){
 			printf("%c", maze[i][j]);
 		}
 		printf("\n");
 	}
-
+	
 }
 

@@ -10,10 +10,14 @@ int mark()
     maze[x][y]='#'; //mark the current position of the maze using a # sign 
 }
 
-bool isSafe()
+bool isSafe(int maze[total_rows][total_columns], int x, int y)
 {
+    if (x >= '\n' && x < total_rows && y >= '\n' && y < total_columns && maze[x][y] == 1)
+    {
+        return true;
+    }
+    return false;
     //checks if the next positions are pheromone free 
-
 }
 void move_forward()
 {
