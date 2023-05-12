@@ -7,7 +7,7 @@
 
 #define MAX_LEN 30
 
-char maze[MAX_LEN][MAX_LEN];
+extern char maze[MAX_LEN][MAX_LEN];
 
 int main (){
 	FILE *inp = fopen ("maze1.txt", "r");
