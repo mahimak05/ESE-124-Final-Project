@@ -21,11 +21,13 @@ ANTstack COORD;
 
 int current_row, current_col, row_temp = -1, col_temp = -1;
 extern char maze[MAX_ROW][MAX_COL];        // used in main.c
+extern int deed_pts, num_rows, num_col;
 
 int empty_spot(int row, int col){	//return 1 if invalid spot, else return 0
-	if(row>(sizeof(maze)/sizeof(maze[0])-1)||current_row<0||col>(sizeof(maze[0])/sizeof(maze[0][0])-1)||col<0||maze[row][col]=='*') return 1;	
+	if(row>num_rows||row<0||col>num_col||col<0||maze[row][col]=='*') return 1;	
 	else return 0;
 }
+
 int start(){
 	if(empty_spot(current_row, current_col)){
 		printf("That is not a valid starting point!\n");
@@ -43,45 +45,53 @@ void mark(){
 }
 
 //returns 1 if move is not possible, else return 0
-void move_forward(){
+void move_right(){
     if(empty_spot(current_row, current_col+1)){
-		printf("Cannot move forward!\n");
+		printf("Cannot move right!\n");
 	}
 	else{
-		current_col++; //move x position 1 forward
-	}
-}
-
-void move_backward(){
-    if(empty_spot(current_row, current_col-1)){
-		printf("Cannot move backward!\n");
-	}
-	else{
-		current_col--; //move x position 1 backward
+		current_col++; //move position 1 right
+		if(maze[current_row][current_col]>=48&&maze[current_row][current_col]<=57) deed_pts += (maze[current_row][current_col]-48);	//check for good deed
+		if(maze[current_row][current_col]!='#') maze[current_row][current_col] = '+';
 	}
 }
 
 void move_left(){
+    if(empty_spot(current_row, current_col-1)){
+		printf("Cannot move left!\n");
+	}
+	else{
+		current_col--; //move position 1 left
+		if(maze[current_row][current_col]>=48&&maze[current_row][current_col]<=57) deed_pts += (maze[current_row][current_col]-48);	//check for good deed
+		if(maze[current_row][current_col]!='#') maze[current_row][current_col] = '+';
+	}
+}
+
+void move_backward(){
     if(empty_spot(current_row-1, current_col)){
-		printf("Cannot move left!\n"); 
+		printf("Cannot move backward!\n"); 
 	}
 	else{
-		current_row--; //move y position 1 to the left
+		current_row--; //move position 1 backward
+		if(maze[current_row][current_col]>=48&&maze[current_row][current_col]<=57) deed_pts += (maze[current_row][current_col]-48);	//check for good deed
+		if(maze[current_row][current_col]!='#') maze[current_row][current_col] = '+';
 	}
 }
 
-void move_right(){
+void move_forward(){
     if(empty_spot(current_row+1, current_col)){
-		printf("Cannot move right!\n");
+		printf("Cannot move forward!\n");
 	}
 	else{
-		current_row++; //move y position 1 to the left
+		current_row++; //move position 1 forward
+		if(maze[current_row][current_col]>=48&&maze[current_row][current_col]<=57) deed_pts += (maze[current_row][current_col]-48);	//check for good deed
+		if(maze[current_row][current_col]!='#') maze[current_row][current_col] = '+';
 	}
 }
 
-void CWL(){
+void CWB(){
 	int i = 1;
-	//checks left position until wall
+	//checks back position until wall
 	while(maze[current_row-i][current_col]!='*'&&current_row-i>=0){
 		if(maze[current_row-i][current_col]=='#'){	//stops if it detects pheromone
 			itch = NONE;
@@ -91,15 +101,15 @@ void CWL(){
 		i++;
 	}
 	if(i>1&&maze[current_row-i][current_col]=='*'){
-		itch = LEFT;
+		itch = BACKWARD;
 		itch_space = i - 1;
 	}
 }
 
-void CWR(){
+void CWF(){
 	int i = 1;
-	//checks right position until wall
-	while(maze[current_row+i][current_col]!='*'&&current_row+i<(sizeof(maze)/sizeof(maze[0]))){
+	//checks forward position until wall
+	while(maze[current_row+i][current_col]!='*'&&current_row+i<num_rows){
 		if(maze[current_row+i][current_col]=='#'){	//stops if it detects pheromone
 			itch = NONE;
 			itch_space = 0;
@@ -108,15 +118,15 @@ void CWR(){
 		i++;
 	}
 	if(i>1&&maze[current_row+i][current_col]=='*'){
-		itch = RIGHT;
+		itch = FORWARD;
 		itch_space = i - 1;
 	}
 }
 
-void CWF(){
+void CWR(){
 	int i = 1;
-	//checks forward position until wall
-	while(maze[current_row][current_col+i]!='*'&&current_col+i<(sizeof(maze[0])/sizeof(maze[0][0]))){
+	//checks right position until wall
+	while(maze[current_row][current_col+i]!='*'&&current_col+i<num_col){
 		if(maze[current_row][current_col+i]=='#'){	//stops if it detects pheromone
 			itch = NONE;
 			itch_space = 0;
@@ -125,11 +135,11 @@ void CWF(){
 		i++;
 	}
 	if(i>1&&maze[current_row][current_col+i]=='*'){
-		itch = FORWARD;
+		itch = RIGHT;
 		itch_space = i - 1;
 	}
 }
-void CWB(){
+void CWL(){
 	int i = 1;
 	//checks backward position until wall
 	while(maze[current_row][current_col-i]!='*'&&current_col-i>=0){
@@ -141,7 +151,7 @@ void CWB(){
 		i++;
 	}
 	if(i>1&&maze[current_row][current_col-i]=='*'){
-		itch = BACKWARD;
+		itch = LEFT;
 		itch_space = i - 1;
 	}
 }
@@ -150,21 +160,29 @@ void BJPI(){
 		case NONE:
 			printf("No itch!\n");
 		case LEFT:
-			current_row -= itch_space;		
+			while(itch_space>0){
+				move_left();
+				itch_space--;
+			}
 			itch = NONE;
-			itch_space = 0;
 		case RIGHT:	
-			current_row += itch_space;		
+			while(itch_space>0){
+				move_right();
+				itch_space--;
+			}
 			itch = NONE;
-			itch_space = 0;
 		case FORWARD:
-			current_col += itch_space;	
+			while(itch_space>0){
+				move_forward();
+				itch_space--;
+			}
 			itch = NONE;
-			itch_space = 0;
 		case BACKWARD:	
-			current_col -= itch_space;
+			while(itch_space>0){
+				move_backward();
+				itch_space--;
+			}
 			itch = NONE;
-			itch_space = 0;	
 	}
 }
 void CJPI(){
@@ -172,19 +190,19 @@ void CJPI(){
 		case NONE:
 			printf("No itch!\n");
 		case LEFT:
-			current_row--;		
+			move_left();		
 			itch = NONE;
 			itch_space = 0;
 		case RIGHT:	
-			current_row++;		
+			move_right();		
 			itch = NONE;
 			itch_space = 0;
 		case FORWARD:
-			current_col++;	
+			move_forward();	
 			itch = NONE;
 			itch_space = 0;
 		case BACKWARD:	
-			current_col--;
+			move_backward();
 			itch = NONE;
 			itch_space = 0;	
 	}
@@ -236,9 +254,4 @@ void BACKTRACK(){
     	current_col = col_temp;
     }
 }
-void RP(void (*n)(), int t){
-	int i;
-	for(i = 0; i < t; i++){
-		(*n)();
-	}
-}
+//void RP(int n, int t);

@@ -22,5 +22,4 @@ void POP();
 void PEEK();
 void CLEAR();
 void BACKTRACK();
-void RP(void (*n)(), int t);
-
+//void RP(int n, int t);
